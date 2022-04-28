@@ -34,7 +34,7 @@ public class Boot {
 		
 		TileGrid grid = new TileGrid(map);
 		grid.setTile(3, 3, grid.getTile(14, 2).getType());
-		Enemy e = new Enemy(loadTexture("ufo"), grid.getTile(10, 10), 64, 64, 8);
+		Enemy e = new Enemy(loadTexture("ufo"), grid.getTile(10, 10), grid, 64, 64, 8);
 		Wave wave = new Wave(10, e);
 		Player player = new Player(grid);
 		

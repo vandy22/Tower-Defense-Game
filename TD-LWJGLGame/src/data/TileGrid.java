@@ -38,15 +38,13 @@ public class TileGrid {
 		map[xCoord][yCoord] = new Tile(xCoord * 64, yCoord * 64, 64, 64, type);
 	}
 	
-	public Tile getTile(int xCoord, int yCoord) {
-		return map[xCoord][yCoord];
+	public Tile getTile(int xPlace, int yPlace) {
+		return map[xPlace][yPlace];
 	}
 	
 	public void draw() {
 		for(int i = 0; i < map.length; i++) {
 			for(int j = 0; j < map[i].length; j++) {
-				//Tile t = map[i][j];
-				//drawQuadTex(t.getTexture(), t.getX(), t.getY(), t.getW(), t.getH());
 				map[i][j].draw();
 			}
 		}

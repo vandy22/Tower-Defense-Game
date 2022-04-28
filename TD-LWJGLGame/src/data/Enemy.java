@@ -5,14 +5,20 @@ import org.newdawn.slick.opengl.Texture;
 import static helpers.Artist.*;
 import static helpers.Clock.*;
 
+import java.util.ArrayList;
+
 public class Enemy {
-	private int w, h, health;
+	private int w, h, health, currentCheckpoint;
 	private float speed, x, y;
 	Texture texture;
 	private Tile startTile;
 	private boolean first = true;
+	private TileGrid grid;
 	
-	public Enemy(Texture texture, Tile startTile, int w, int h, float speed) {
+	private ArrayList<Checkpoint> checkpoints;
+	private int[] directions;
+	
+	public Enemy(Texture texture, Tile startTile, TileGrid grid, int w, int h, float speed) {
 		this.texture = texture;
 		this.startTile = startTile;
 		this.x = startTile.getX();
@@ -20,6 +26,15 @@ public class Enemy {
 		this.w = w;
 		this.h = h;
 		this.speed = speed;
+		this.grid = grid;
+		
+		this.checkpoints = new ArrayList<Checkpoint>();
+		this.directions = new int[2];
+		this.directions[0] = 0;
+		this.directions[1] = 0;
+		this.directions = findNextD(startTile);
+		this.currentCheckpoint = 0;
+		populateCheckpointList();
 	}
 	
 	public void draw() {
@@ -29,8 +44,75 @@ public class Enemy {
 	public void update() {
 		if(first)
 			first = false;
-		else
-			x += delta() * speed;
+		else {
+			x += delta() * directions[0];
+			y += delta() * directions[1] * speed;
+		}
+	}
+	
+	private int[] findNextD(Tile t) {
+		int[] dir = new int[2];
+		Tile up = grid.getTile(t.getXPlace(), t.getYPlace() - 1);
+		Tile right = grid.getTile(t.getXPlace() + 1, t.getYPlace());
+		Tile down = grid.getTile(t.getXPlace(), t.getYPlace() + 1);
+		Tile left = grid.getTile(t.getXPlace() - 1, t.getYPlace());
+		
+		if(t.getType() == up.getType()) {
+			dir[0] = 0;
+			dir[1] = -1;
+		}else if(t.getType() == right.getType()) {
+			dir[0] = 1;
+			dir[1] = 0;
+		}else if(t.getType() == down.getType()) {
+			dir[0] = 0;
+			dir[1] = 1;
+		}else if(t.getType() == left.getType()) {
+			dir[0] = -1;
+			dir[1] = 0;
+		}else {
+			dir[0] = 2;
+			dir[1] = 2;
+		}
+		return dir;
+	}
+	
+	private void populateCheckpointList() {
+		checkpoints.add(findNextC(startTile, directions = findNextD(startTile)));
+		
+		int counter = 0;
+		boolean cont = true;
+		while(cont) {
+			int[] currentD = findNextD(checkpoints.get(counter).getTile());
+			if(currentD[0] == 2) {
+				cont = false;
+			}else {
+				checkpoints.add(findNextC((checkpoints.get(counter).getTile()), directions = findNextD(checkpoints.get(counter).getTile())));
+			}
+			counter++;
+		}
+	}
+	
+	private Checkpoint findNextC(Tile t, int[] dir) {
+		Tile next = null;
+		Checkpoint c = null;
+		
+		boolean found = false;
+		int counter = 1;
+		
+		while(!found) {
+			
+			if(t.getType() != grid.getTile(t.getXPlace() + dir[0] * counter, t.getYPlace() + dir[1] * counter).getType()) {
+				found = true;
+				counter -= 1;
+				next = grid.getTile(t.getXPlace() + dir[0] * counter, t.getYPlace() + dir[1] * counter);
+			}
+			
+			counter++;
+		}
+		
+		c = new Checkpoint(next, dir[0], dir[1]);
+		return c;
+		
 	}
 
 	public int getW() {
@@ -103,6 +185,10 @@ public class Enemy {
 
 	public void setFirst(boolean first) {
 		this.first = first;
+	}
+	
+	public TileGrid getTileGrid() {
+		return grid;
 	}
 	
 }
