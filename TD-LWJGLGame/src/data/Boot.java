@@ -38,6 +38,8 @@ public class Boot {
 		Wave wave = new Wave(10, e);
 		Player player = new Player(grid);
 		
+		//TEST 1
+		
 		while(!Display.isCloseRequested()) {
 			//System.out.println("Clock " + Clock.delta());
 			Clock.update();
