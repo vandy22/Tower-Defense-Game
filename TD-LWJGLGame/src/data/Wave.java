@@ -24,8 +24,10 @@ public class Wave {
 			timeSinceLastSpawn = 0;
 		}
 		for(Enemy e: enemyList) {
-			e.update();
-			e.draw();
+			if(e.isAlive()) {
+				e.update();
+				e.draw();
+			}	
 		}
 	}
 	
