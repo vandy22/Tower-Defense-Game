@@ -64,6 +64,30 @@ public class Artist {
 		glLoadIdentity();
 	}
 	
+	public static void drawQuadTexRot(Texture tex, float x, float y, float w, float h, float angle) {
+		tex.bind();
+		glTranslatef(x+(w/2) , y+(h/2) , 0);
+		glRotatef(angle, 0, 0, 1);
+		glTranslatef(- w / 2, - h / 2, 0);
+		glBegin(GL_QUADS);
+		
+		
+		glTexCoord2f(0,0);
+		glVertex2f(0,0);
+		
+		glTexCoord2f(1,0);
+		glVertex2f(w, 0);
+		
+		glTexCoord2f(1, 1);
+		glVertex2f(w,h);
+		
+		glTexCoord2f(0,1);
+		glVertex2f(0,h);
+		
+		glEnd();
+		glLoadIdentity();
+	}
+	
 	public static Texture loadTexture(String imgName) {
 		//All textures must be set as PNG
 		Texture tex = null;

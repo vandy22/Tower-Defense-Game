@@ -16,10 +16,10 @@ public class Clock {
 		long currentTime = getTime();
 		int delta = (int) (currentTime - lastFrame);
 		lastFrame = getTime();
-		if(delta * 0.01f > 0.5f) {
-			return 0.5f; 
+		if(delta * 0.001f > 0.05f) {
+			return 0.05f; 
 		}
-		return delta * 0.01f;
+		return delta * 0.001f;
 	}
 	
 	public static float delta() {
@@ -42,7 +42,7 @@ public class Clock {
 		totalTime += d;
 	}
 	
-	public static void changeMultiplier(int change) {
+	public static void changeMultiplier(float change) {
 		if(multiplier + change < -1 && multiplier + change > 7) {
 			//Not sure why he didnt just make it not this? and use here
 		}else {
