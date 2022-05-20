@@ -14,7 +14,8 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class Artist {
 
-	public static final int WIDTH = 1280, HEIGHT = 960;
+	public static final int WIDTH = 1472, HEIGHT = 960;
+	public static final int TILE_SIZE = 64;
 	
 	public static void beginSession() {
 		Display.setTitle("TD Game");
@@ -32,6 +33,14 @@ public class Artist {
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		
+	}
+	
+	public static boolean checkCollision(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
+		if(x1 + w1 > x2 && x1 < x2 + w2 && y1 + h1 > y2 && y1 < y2 + h2) {
+			return true;
+		}
+		return false;
 	}
 	
 	public static void drawQuad(float x, float y, float w, float h) {
@@ -40,6 +49,19 @@ public class Artist {
 		glVertex2f(x+w,y); //Top right corner
 		glVertex2f(x+w,y+h); //Bottom right corner
 		glVertex2f(x,y+h); //Bottom left corner
+		glEnd();
+		glLoadIdentity();
+	}
+	
+	public static void drawQuadTrans(float x, float y, float w, float h) {
+		glBegin(GL_LINES);
+		//glVertex2f(x,y); //Top left corner
+		//glVertex2f(x+w,y); //Top right corner
+		//glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex2f(10,10); //Top left corner
+		glVertex2f(100,100); //Top right corner
+		//glVertex2f(x+w,y+h); //Bottom right corner
+		//glVertex2f(x,y+h); //Bottom left corner
 		glEnd();
 	}
 	

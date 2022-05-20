@@ -8,10 +8,12 @@ public class TileGrid {
 	private int tilesWide, tilesHigh;
 	
 	public TileGrid() {
+		this.tilesWide = 20;
+		this.tilesHigh = 15;
 		map = new Tile[20][15];
 		for(int i = 0; i < map.length; i++) {
 			for(int j = 0; j < map[i].length; j++) {
-				map[i][j] = new Tile(i * 64, j * 64, 64, 64, TileType.Grass);
+				map[i][j] = new Tile(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE, TileType.Grass);
 			}
 		}
 	}
@@ -24,13 +26,13 @@ public class TileGrid {
 			for(int j = 0; j < map[i].length; j++) {
 				switch(newMap[j][i]) {
 				case 0:
-					map[i][j] = new Tile(i * 64, j * 64, 64, 64, TileType.Grass);
+					map[i][j] = new Tile(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE, TileType.Grass);
 					break;
 				case 1:
-					map[i][j] = new Tile(i * 64, j * 64, 64, 64, TileType.Dirt);
+					map[i][j] = new Tile(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE, TileType.Dirt);
 					break;
 				case 2:
-					map[i][j] = new Tile(i * 64, j * 64, 64, 64, TileType.Water);
+					map[i][j] = new Tile(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE, TileType.Water);
 					break;
 				}		
 			}
@@ -38,14 +40,14 @@ public class TileGrid {
 	}
 	
 	public void setTile(int xCoord, int yCoord, TileType type) {
-		map[xCoord][yCoord] = new Tile(xCoord * 64, yCoord * 64, 64, 64, type);
+		map[xCoord][yCoord] = new Tile(xCoord * TILE_SIZE, yCoord * TILE_SIZE, TILE_SIZE, TILE_SIZE, type);
 	}
 	
 	public Tile getTile(int xPlace, int yPlace) {
 		if(xPlace < tilesWide && yPlace < tilesHigh && xPlace > -1 && yPlace > -1)
 			return map[xPlace][yPlace];
 		else
-			return new Tile(0,0,0,0, TileType.NULL);
+			return new Tile(0,-TILE_SIZE,0,0, TileType.NULL);
 	}
 	
 	public void draw() {

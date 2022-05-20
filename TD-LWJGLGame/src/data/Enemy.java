@@ -1,4 +1,4 @@
-package data;
+ package data;
 
 import org.newdawn.slick.opengl.Texture;
 
@@ -7,19 +7,29 @@ import static helpers.Clock.*;
 
 import java.util.ArrayList;
 
-public class Enemy {
-	private int w, h, health, currentCheckpoint;
-	private float speed, x, y;
-	Texture texture;
+public class Enemy implements Entity{
+	private int w, h, currentCheckpoint;
+	private float speed, x, y, health, startHealth;
+	Texture texture, healthBackground, healthForeground, healthBorder;
 	private Tile startTile;
 	private boolean first = true, alive = true;
 	private TileGrid grid;
 	
+	private float timeSinceFreeze;
+	private boolean isFrozen;
+	private float originalSpeed;
+	private float freezeSpeed;
+	private float freezeTime;
+	
+	
 	private ArrayList<Checkpoint> checkpoints;
 	private int[] directions;
 	
-	public Enemy(Texture texture, Tile startTile, TileGrid grid, int w, int h, float speed) {
+	public Enemy(Texture texture, Tile startTile, TileGrid grid, int w, int h, float speed, float health) {
 		this.texture = texture;
+		this.healthBackground = loadTexture("health_background");
+		this.healthForeground = loadTexture("health_foreground");
+		this.healthBorder = loadTexture("health_border");
 		this.startTile = startTile;
 		this.x = startTile.getX();
 		this.y = startTile.getY();
@@ -27,6 +37,15 @@ public class Enemy {
 		this.h = h;
 		this.speed = speed;
 		this.grid = grid;
+		this.health = health;
+		this.startHealth = health;
+		
+		//Freeze Variables
+		this.originalSpeed = speed;
+		this.freezeSpeed = 0;
+		this.freezeTime = 0;
+		this.timeSinceFreeze = 0;
+		this.isFrozen = false;
 		
 		this.checkpoints = new ArrayList<Checkpoint>();
 		this.directions = new int[2];
@@ -40,7 +59,11 @@ public class Enemy {
 	}
 	
 	public void draw() {
+		float healthPercentage = health / startHealth;
 		drawQuadTex(texture, x, y, w, h);
+		drawQuadTex(healthBackground, x, y - 16, w, 8);
+		drawQuadTex(healthForeground, x, y - 16, w * healthPercentage, 8);
+		drawQuadTex(healthBorder, x, y - 16, w, 8);
 	}
 	
 	public void update() {
@@ -49,7 +72,7 @@ public class Enemy {
 		else {
 			if(checkpointReached()) {
 				if(currentCheckpoint + 1 == checkpoints.size())
-					die();
+					endReached();
 				else
 					currentCheckpoint++;
 			}else {
@@ -57,7 +80,22 @@ public class Enemy {
 				y += delta() * checkpoints.get(currentCheckpoint).getyDirection() * speed;
 			}
 			
+			if(isFrozen) {
+				timeSinceFreeze += delta();
+				if (timeSinceFreeze < freezeTime) {
+					speed = freezeSpeed;
+				}else {
+					speed = originalSpeed;
+					timeSinceFreeze = 0;
+					isFrozen = false;
+				}	
+			}
 		}
+	}
+	
+	private void endReached() {
+		Player.modifyLives(-1);
+		die();
 	}
 	
 	private int[] findNextD(Tile t) {
@@ -155,6 +193,14 @@ public class Enemy {
 		return c;
 	}
 	
+	public void damage(int amount) {
+		health -= amount;
+		if(health <= 0) {
+			Player.modifyCash(5);
+			die();
+		}
+	}
+	
 	private void die() {
 		alive = false;
 	}
@@ -175,7 +221,7 @@ public class Enemy {
 		this.h = h;
 	}
 
-	public int getHealth() {
+	public float getHealth() {
 		return health;
 	}
 
@@ -237,5 +283,11 @@ public class Enemy {
 	
 	public boolean isAlive() {
 		return alive;
+	}
+	
+	public void setFrozen(boolean frozen, float freezeSpeed, float freezeTime) {
+		this.isFrozen = frozen;
+		this.freezeSpeed = freezeSpeed;
+		this.freezeTime = freezeTime;
 	}
 }

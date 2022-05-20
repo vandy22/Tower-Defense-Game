@@ -24,11 +24,11 @@ public class WaveManager {
 		if(!currentWave.isCompleted()){
 			currentWave.update();
 		}else {
-			newWave();
+			//newWave();
 		}
 	}
 	
-	private void newWave() {
+	public void newWave() {
 		currentWave = new Wave(enemyType, timeBetweenEnemies, enemiesPerWave);
 		waveNumber++;
 		System.out.println("Wave: " + waveNumber);
@@ -36,5 +36,9 @@ public class WaveManager {
 	
 	public Wave getCurrentWave() {
 		return currentWave;
+	}
+	
+	public int getWaveNumber() {
+		return waveNumber;
 	}
 }
