@@ -26,8 +26,8 @@ public class UI {
 	}
 	//Two textures
 	public void addButton(String name, String[] textureNames, int x, int y) {
-		Texture[] textures = new Texture[20];
-		for(int i = 0; i < textureNames.length; i++) {
+		Texture[] textures = new Texture[textureNames.length];
+		for(int i = 0; i < textures.length; i++) {
 			textures[i] = loadTexture(textureNames[i]);
 		}
 		buttonList.add(new Button(name, textures, x, y));
@@ -110,6 +110,8 @@ public class UI {
 			font = new TrueTypeFont(awtFont, false);
 		}
 		
+		
+		
 		public void drawString(String text, int x, int y) {
 			font.drawString(x, y, text);
 		}
@@ -125,6 +127,24 @@ public class UI {
 			System.out.println(b.getName());
 			numOfButtons++;
 			menuButtons.add(b);
+		}
+		
+		public void updateFont(int fontSize) {
+			this.fontSize = fontSize;
+			awtFont = new Font("Times New Roman", Font.BOLD, fontSize);
+			font = new TrueTypeFont(awtFont, false);
+			System.out.println("running");
+		}
+		
+		public void update() {
+			numOfButtons = 0;
+			for(Button b: menuButtons) {
+				b.setY(y + (numOfButtons / optionsWidth) * (padding + TILE_SIZE) + padding);
+				b.setX(x + (numOfButtons % optionsWidth) * (padding + TILE_SIZE) + padding);
+				numOfButtons++;
+			}
+			
+			
 		}
 		
 		public boolean isButtonClicked(String buttonName) {
@@ -156,8 +176,45 @@ public class UI {
 			}
 		}
 		
+		public ArrayList<Button> getMenuButtons(){
+			return menuButtons;
+		}
+		
 		public String getName() {
 			return name;
 		}
+		
+		public void setX(int x) {
+			this.x = x;
+		}
+		
+		public int getX() {
+			return x;
+		}
+		
+		public void setY(int y) {
+			this.y = y;
+		}
+		
+		public int getY() {
+			return y;
+		}
+
+		public TrueTypeFont getFont() {
+			return font;
+		}
+
+		public void setFont(TrueTypeFont font) {
+			this.font = font;
+		}
+
+		public int getFontSize() {
+			return fontSize;
+		}
+
+		public void setFontSize(int fontSize) {
+			this.fontSize = fontSize;
+		}
+		
 	}
 }

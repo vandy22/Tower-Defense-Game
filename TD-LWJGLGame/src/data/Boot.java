@@ -2,6 +2,8 @@ package data;
 
 import org.lwjgl.opengl.Display;
 
+import audio.AudioLibrary;
+import audio.AudioMaster;
 import helpers.Clock;
 import helpers.StateManager;
 
@@ -11,9 +13,10 @@ public class Boot {
 	
 	public Boot() {
 		
+		AudioMaster.init();
+		AudioMaster.setListenerData();
+		
 		beginSession();
-
-		//Game game = new Game(map);
 		
 		while(!Display.isCloseRequested()) {
 			
@@ -22,9 +25,11 @@ public class Boot {
 			StateManager.update();
 			
 			Display.update();
-			Display.sync(60);
+			Display.sync(120);
 		} 
 		
+		AudioLibrary.audioSource.delete();
+		AudioMaster.cleanUp();
 		Display.destroy();
 	}
 	

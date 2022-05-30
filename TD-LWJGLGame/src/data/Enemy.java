@@ -196,7 +196,7 @@ public class Enemy implements Entity{
 	public void damage(int amount) {
 		health -= amount;
 		if(health <= 0) {
-			Player.modifyCash(5);
+			Player.modifyCash(50);
 			die();
 		}
 	}

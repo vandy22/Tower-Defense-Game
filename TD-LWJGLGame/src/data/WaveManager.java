@@ -24,7 +24,7 @@ public class WaveManager {
 		if(!currentWave.isCompleted()){
 			currentWave.update();
 		}else {
-			//newWave();
+			newWave();
 		}
 	}
 	

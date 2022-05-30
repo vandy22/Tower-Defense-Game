@@ -2,6 +2,8 @@ package data;
 
 import org.newdawn.slick.opengl.Texture;
 
+import audio.AudioLibrary;
+
 import static helpers.Artist.*;
 import static helpers.Clock.delta;
 
@@ -49,7 +51,7 @@ public abstract class Tower implements Entity{
 		}
 		return closest;
 	}
-	
+
 	private Enemy findLeastHealthTarget() {
 		Enemy leastHealth = null;
 		float lowestHealth = 10000;
@@ -115,6 +117,7 @@ public abstract class Tower implements Entity{
 		timeSinceLastShot += delta();
 		
 		if(timeSinceLastShot > firingSpeed && target != null) {
+			AudioLibrary.audioSource.play(AudioLibrary.shootSound);
 			shoot(target);
 			timeSinceLastShot = 0;
 		}
@@ -127,11 +130,10 @@ public abstract class Tower implements Entity{
 	}
 
 	public void draw() {
+		this.textures = type.textures;
 		drawQuadTex(textures[0], x, y, w, h);
 		if(textures.length > 1) {
-			for(int i = 1; i < textures.length; i++) {
-				drawQuadTexRot(textures[i], x, y, w, h, angle);
-			}
+			drawQuadTexRot(textures[1], x, y, w, h, angle);
 		}
 	}
 	
@@ -197,6 +199,14 @@ public abstract class Tower implements Entity{
 	
 	public boolean isClicked() {
 		return isClicked;
+	}
+	
+	public TowerType getType() {
+		return type;
+	}
+
+	public void setType(TowerType type) {
+		this.type = type;
 	}
 
 }

@@ -25,12 +25,14 @@ public class Game {
 	private Menu towerPickerMenu;
 	private Menu towerPickerText;
 	private Menu playerControls;
-	private UI gameUI;
+	public UI gameUI;
+	private boolean leftMouseButtonDown;
+	
 	
 	public Game(TileGrid grid) {
 		this.grid = grid;
 		gameMenuUI = loadTexture("game_menu_background");
-		waveManager = new WaveManager(new Enemy(loadTexture("egg_enemy"), grid.getTile(0, 1), grid, 64, 64, 100, 200), 1f, 15);
+		waveManager = new WaveManager(new Enemy(loadTexture("egg_enemy"), grid.getTile(0, 1), grid, 64, 64, 100, 200), 1f, 20);
 		player = new Player(grid, waveManager);
 		player.setup();
 		setupGameUI();
@@ -57,15 +59,11 @@ public class Game {
 		towerPickerMenu.quickAdd("TowerCannon", ("tower_cannon_base"));
 		towerPickerMenu.quickAdd("TowerIce", ("tower_ice_base"));
 		
-		//gameUI.addButton("Play", "play", 1330, 900);
-		//gameUI.addButton("Pause", "pause", 1360, 900);
-		//gameUI.addButton("SpeedUp", "speed_up", 1390, 900);
-		
 		gameUI.addButton("targetType", targetTypeTextures, 1300, 700);
 	}
 	
 	private void setupTowerUI() {
-		towerPickerText.drawString("Cost: " + TowerType.TOWER_CANNON.cost, towerPickerMenu.getButton("TowerCannon").getX(), towerPickerMenu.getButton("TowerCannon").getY()+TILE_SIZE+1);
+		towerPickerText.drawString("Cost: " + TowerType.TOWER_CANNON0.cost, towerPickerMenu.getButton("TowerCannon").getX(), towerPickerMenu.getButton("TowerCannon").getY()+TILE_SIZE+1);
 		towerPickerText.drawString("Cost: " + TowerType.TOWER_ICE.cost, towerPickerMenu.getButton("TowerIce").getX(), towerPickerMenu.getButton("TowerIce").getY() + TILE_SIZE+1);
 
 	}
@@ -73,6 +71,7 @@ public class Game {
 	private void updateUI() {
 		gameUI.draw();
 		setupTowerUI();
+	
 		towerPickerMenu.drawString("Lives: " + Player.lives, 1300, 500);
 		towerPickerMenu.drawString("Cash: " + Player.cash, 1300, 550);
 		towerPickerMenu.drawString("Wave: " + waveManager.getWaveNumber(), 1300, 600);
@@ -81,33 +80,18 @@ public class Game {
 		
 		
 		if(Mouse.next()) {
-			if(Mouse.isButtonDown(0)) {
+			if(Mouse.isButtonDown(0) && !leftMouseButtonDown) {
 				if(towerPickerMenu.isButtonClicked("TowerCannon")) {
-					player.pickTower(new TowerCannon(TowerType.TOWER_CANNON, grid.getTile(0, 0), waveManager.getCurrentWave().getEnemyList()));
+					player.pickTower(new TowerCannon(TowerType.TOWER_CANNON0, grid.getTile(0, 0), waveManager.getCurrentWave().getEnemyList()));
 				}
 				else if(towerPickerMenu.isButtonClicked("TowerIce")) {
 					player.pickTower(new TowerIce(TowerType.TOWER_ICE, grid.getTile(1, 0), waveManager.getCurrentWave().getEnemyList()));
-				}
-				//Targeting type button
-				else if(gameUI.isButtonClicked("targetType")) {
-					for(int i = 0; i < player.getTowerList().size(); i++) {
-						if(player.getTowerList().get(i).getTargetingType() == 0) {
-							gameUI.getButton("targetType").setCurrentButtonTexture(1);
-							System.out.println("Least health enemy targeting");
-							player.getTowerList().get(i).setTargetingType(1);
-							
-						}else {
-							gameUI.getButton("targetType").setCurrentButtonTexture(0);
-							System.out.println("Closest enemy targeting");
-							player.getTowerList().get(i).setTargetingType(0);
-						}
-					}
-				}
+				} 
 				else if(playerControls.isButtonClicked("Play")) {
 					if(Clock.multiplier == 0) {
 						Clock.multiplier = 1;
 					}else if(waveManager.getCurrentWave().isCompleted()) {
-						waveManager.newWave();
+						//waveManager.newWave();
 					}
 				}
 				else if(playerControls.isButtonClicked("Pause")) {
@@ -117,10 +101,11 @@ public class Game {
 					if(Clock.multiplier == 1) {
 						Clock.multiplier = 2;
 					}
-					
 				}
 			}
 		}
+		
+		leftMouseButtonDown = Mouse.isButtonDown(0);
 	}
 	
 	public void update() {

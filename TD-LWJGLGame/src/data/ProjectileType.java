@@ -6,7 +6,9 @@ import static helpers.Artist.*;
 
 public enum ProjectileType {
 	
-	CANNON_BALL(loadTexture("cannon_bullet"), 50, 380),
+	CANNON_BALL(loadTexture("cannon_bullet"), 50, 360),
+	CANNON_BALL1(loadTexture("cannon_bullet"), 100, 440),
+	CANNON_BALL2(loadTexture("cannon_bullet"), 150, 560),
 	ICE_SHARD(loadTexture("ice_bullet"), 5, 500);
 	
 	Texture texture;

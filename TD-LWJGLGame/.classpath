@@ -2,12 +2,12 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Documents/Eclipse Projects/Tower Defense/lib/jars/lwjgl.jar">
+	<classpathentry kind="lib" path="/Users/ppi_user/Downloads/lwjgl-2.9.3/jar/lwjgl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Jackson/Documents/Eclipse Projects/Tower Defense/lib/natives"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/ppi_user/Downloads/lwjgl-2.9.3/native/macosx"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Documents/Eclipse Projects/Tower Defense/lib/jars/lwjgl_util.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Documents/Eclipse Projects/Tower Defense/lib/jars/slick-util.jar"/>
+	<classpathentry kind="lib" path="/Users/ppi_user/Downloads/lwjgl-2.9.3/jar/lwjgl_util.jar"/>
+	<classpathentry kind="lib" path="/Users/ppi_user/Downloads/slick-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
