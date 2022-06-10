@@ -41,6 +41,16 @@ public class Button {
 		this.h = textures[0].getImageWidth();
 		this.multipleTextures = true;
 	}
+	
+	public Button(String name, Texture[] textures, int x, int y, int w, int h) {
+		this.name = name;
+		this.textures = textures;
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+		this.multipleTextures = true;
+	}
 
 	public String getName() {
 		return name;
@@ -96,6 +106,10 @@ public class Button {
 	
 	public Texture[] getTextures() {
 		return textures;
+	}
+	
+	public void setTextures(Texture[] textures) {
+		this.textures = textures;
 	}
 	
 	public int getCurrentButtonTexture() {

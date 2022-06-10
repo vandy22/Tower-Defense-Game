@@ -5,6 +5,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static helpers.Artist.TILE_SIZE;
 
 public class TowerCannon extends Tower{
+	
+	public String[] upgradeTextures = new String[] {"tower_cannon/tower_cannon_full_2", "tower_cannon/tower_cannon_full_3"};
 
 	public TowerCannon(TowerType type, Tile startTile, CopyOnWriteArrayList<Enemy> enemies) {
 		super(type, startTile, enemies);

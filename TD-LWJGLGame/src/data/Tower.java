@@ -22,6 +22,10 @@ public abstract class Tower implements Entity{
 	private int targetingType;
 	private Tile currentTile;
 	private boolean isClicked;
+	private Texture rangeCircle;
+	public float circleDistance;
+	
+	private int ID;
 	
 	public Tower(TowerType type, Tile startTile, CopyOnWriteArrayList<Enemy> enemies) {
 		this.type = type;
@@ -38,6 +42,8 @@ public abstract class Tower implements Entity{
 		this.projectiles = new ArrayList<Projectile>();
 		this.angle = 0f;
 		this.targetingType = 0;
+		this.ID = 0;
+		this.rangeCircle = loadTexture("tower_range_circle");
 	}
 	
 	private Enemy findClosestTarget() {
@@ -50,6 +56,34 @@ public abstract class Tower implements Entity{
 			}
 		}
 		return closest;
+	}
+	/*
+	private Enemy findFarthestTarget() {
+		Enemy farthest = null;
+		float farthestDistance = 0;
+		int currentCheckpoint = 0;
+		for(Enemy e: enemies) {
+			if(isInRange(e) && findDistance(e) > farthestDistance && e.isAlive() && currentCheckpoint < e.getCurrentCheckpoint()) {
+				farthestDistance = findDistance(e);
+				currentCheckpoint = e.getCurrentCheckpoint();
+				farthest = e;
+				
+			}
+		}
+		return farthest;
+	}*/
+	
+	private Enemy findFarthestTarget() {
+		Enemy farthest = null;
+		float farthestDistance = 0;
+		for(Enemy e: enemies) {
+			if(isInRange(e) && findDistance(e) > farthestDistance && e.isAlive()) {
+				farthestDistance = findDistance(e);
+				farthest = e;
+				
+			}
+		}
+		return farthest;
 	}
 
 	private Enemy findLeastHealthTarget() {
@@ -67,15 +101,17 @@ public abstract class Tower implements Entity{
 	private float findDistance(Enemy e) {
 		float xDistance = Math.abs(e.getX() - x);
 		float yDistance = Math.abs(e.getY() - y);
-		return xDistance + yDistance;
+		return xDistance+yDistance;
 	}
 	
 	private boolean isInRange(Enemy e) {
 		float xDistance = Math.abs(e.getX() - x);
 		float yDistance = Math.abs(e.getY() - y);
-		if(xDistance < range && yDistance < range) {
+		float radius = (float) Math.sqrt((Math.pow(xDistance, 2)+Math.pow(yDistance, 2)));
+		if(radius < range) {
 			return true;
 		}
+		
 		return false;
 	}
 	
@@ -96,6 +132,13 @@ public abstract class Tower implements Entity{
 		this.y = currentTile.getY();
 	}
 	
+	public void updateData() {
+		this.textures = type.textures;
+		this.damage = type.damage;
+		this.range = type.range;
+		this.cost = type.cost;
+	}
+	
 	public Tile getTile() {
 		return currentTile;
 	}
@@ -104,8 +147,10 @@ public abstract class Tower implements Entity{
 		//For now, when more targeting types, create a switch statement
 		if(targetingType == 0) {
 			target = findClosestTarget();
-		}else {
+		}else if(targetingType == 1){
 			target = findLeastHealthTarget();
+		}else if(targetingType == 2) {
+			target = findFarthestTarget();
 		}
 		
 		if(target == null || target.isAlive() == false) {
@@ -117,7 +162,7 @@ public abstract class Tower implements Entity{
 		timeSinceLastShot += delta();
 		
 		if(timeSinceLastShot > firingSpeed && target != null) {
-			AudioLibrary.audioSource.play(AudioLibrary.shootSound);
+			//AudioLibrary.audioSource.play(AudioLibrary.shootSound);
 			shoot(target);
 			timeSinceLastShot = 0;
 		}
@@ -126,7 +171,7 @@ public abstract class Tower implements Entity{
 			p.update();
 		}
 		
-		draw();
+		//draw();
 	}
 
 	public void draw() {
@@ -135,6 +180,12 @@ public abstract class Tower implements Entity{
 		if(textures.length > 1) {
 			drawQuadTexRot(textures[1], x, y, w, h, angle);
 		}
+		
+	}
+	
+	public void setDrawRangeRadius(boolean draw) {
+		if(draw)
+			drawQuadTex(rangeCircle, x-range+w/2, y-range+h/2, range*2, range*2);
 	}
 	
 	public float getTileX() {
@@ -208,5 +259,15 @@ public abstract class Tower implements Entity{
 	public void setType(TowerType type) {
 		this.type = type;
 	}
+
+	public int getId() {
+		return ID;
+	}
+
+	public void setId(int towerId) {
+		this.ID = towerId;
+	}
+	
+	
 
 }

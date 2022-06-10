@@ -3,6 +3,8 @@ package data;
 import static helpers.Artist.loadTexture;
 import static helpers.Artist.drawQuadTex;
 import static helpers.Artist.TILE_SIZE;
+import static helpers.Artist.drawQuadRect;
+import static helpers.Artist.drawHollowCircle;
 
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.opengl.Texture;
@@ -28,7 +30,6 @@ public class Game {
 	public UI gameUI;
 	private boolean leftMouseButtonDown;
 	
-	
 	public Game(TileGrid grid) {
 		this.grid = grid;
 		gameMenuUI = loadTexture("game_menu_background");
@@ -52,19 +53,21 @@ public class Game {
 		gameUI.createMenu("PlayerControls", 1315, 900, 192, 960, 3, 0, 10, true, -10);
 		playerControls = gameUI.getMenu("PlayerControls");
 		
-		playerControls.quickAdd("Play", "play");
-		playerControls.quickAdd("Pause", "pause");
-		playerControls.quickAdd("SpeedUp", "speed_up");
+		playerControls.quickAddButton("Play", "play");
+		playerControls.quickAddButton("Pause", "pause");
+		playerControls.quickAddButton("SpeedUp", "speed_up");
 		
-		towerPickerMenu.quickAdd("TowerCannon", ("tower_cannon_base"));
-		towerPickerMenu.quickAdd("TowerIce", ("tower_ice_base"));
+		towerPickerMenu.quickAddTowerButton("TowerCannon", ("tower_cannon/tower_cannon_full_1"));
+		towerPickerMenu.quickAddTowerButton("TowerIce", ("tower_ice/tower_ice_full_1"));
+		
+		
 		
 		gameUI.addButton("targetType", targetTypeTextures, 1300, 700);
 	}
 	
 	private void setupTowerUI() {
 		towerPickerText.drawString("Cost: " + TowerType.TOWER_CANNON0.cost, towerPickerMenu.getButton("TowerCannon").getX(), towerPickerMenu.getButton("TowerCannon").getY()+TILE_SIZE+1);
-		towerPickerText.drawString("Cost: " + TowerType.TOWER_ICE.cost, towerPickerMenu.getButton("TowerIce").getX(), towerPickerMenu.getButton("TowerIce").getY() + TILE_SIZE+1);
+		towerPickerText.drawString("Cost: " + TowerType.TOWER_ICE0.cost, towerPickerMenu.getButton("TowerIce").getX(), towerPickerMenu.getButton("TowerIce").getY() + TILE_SIZE+1);
 
 	}
 	
@@ -85,8 +88,8 @@ public class Game {
 					player.pickTower(new TowerCannon(TowerType.TOWER_CANNON0, grid.getTile(0, 0), waveManager.getCurrentWave().getEnemyList()));
 				}
 				else if(towerPickerMenu.isButtonClicked("TowerIce")) {
-					player.pickTower(new TowerIce(TowerType.TOWER_ICE, grid.getTile(1, 0), waveManager.getCurrentWave().getEnemyList()));
-				} 
+					player.pickTower(new TowerIce(TowerType.TOWER_ICE0, grid.getTile(1, 0), waveManager.getCurrentWave().getEnemyList()));
+				}
 				else if(playerControls.isButtonClicked("Play")) {
 					if(Clock.multiplier == 0) {
 						Clock.multiplier = 1;
@@ -114,6 +117,10 @@ public class Game {
 		waveManager.update();
 		player.update();
 		updateUI();
+		
+		
+		
+		
 	}
 
 }

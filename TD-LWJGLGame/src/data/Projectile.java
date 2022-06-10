@@ -17,8 +17,14 @@ public abstract class Projectile implements Entity{
 	private Enemy target;
 	private boolean alive;
 	private CopyOnWriteArrayList<Enemy> allEnemies;
+	private Texture explosion;
+	
+	private float timeSinceCollision;
+	private float explosionTime;
+	private boolean drawExplosion;
 	
 	public Projectile(ProjectileType type, CopyOnWriteArrayList<Enemy> allEnemies, Enemy target, float x, float y, float w, float h) {
+		this.explosion = type.explosion;
 		this.texture = type.texture;
 		this.x = x;
 		this.y = y;
@@ -30,6 +36,9 @@ public abstract class Projectile implements Entity{
 		this.xVelocity = 0f;
 		this.yVelocity = 0f;
 		this.alive = true;
+		
+		this.explosionTime = 0.05f;
+		this.timeSinceCollision = 0;
 
 		this.allEnemies = allEnemies;
 		calculateDirection();
@@ -58,19 +67,35 @@ public abstract class Projectile implements Entity{
 		if(alive) {
 			x += xVelocity * speed * delta();
 			y += yVelocity * speed * delta();
+			
 			for(Enemy e : allEnemies) {
 				if(e.isAlive()) {
-					if(checkCollision(x, y, w, h, e.getX(), e.getY(), e.getW(), e.getH())) { 
+					if(checkCollision(x, y, w, h, e.getX(), e.getY(), e.getW(), e.getH(), 5)) { 
+						//drawExplosion = true;
 						damage(e);
 					}	
 				}
 			}
 			draw();
 		}
+		
+		if(drawExplosion) {
+			timeSinceCollision += delta();
+			if (timeSinceCollision < explosionTime) {
+				drawExplosion();
+			}else {
+				timeSinceCollision = 0;
+				drawExplosion = false;
+			}	
+		}
 	}
 	
 	public void draw() {
 		drawQuadTex(texture, x, y, 32, 32);
+	}
+	
+	public void drawExplosion() {
+		drawQuadTex(explosion, x+10, y+10, 32, 32);
 	}
 
 	public float getX() {

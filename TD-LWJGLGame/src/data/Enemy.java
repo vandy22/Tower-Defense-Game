@@ -21,6 +21,8 @@ public class Enemy implements Entity{
 	private float freezeSpeed;
 	private float freezeTime;
 	
+	private int enemyWorth = 15;
+	
 	
 	private ArrayList<Checkpoint> checkpoints;
 	private int[] directions;
@@ -196,7 +198,7 @@ public class Enemy implements Entity{
 	public void damage(int amount) {
 		health -= amount;
 		if(health <= 0) {
-			Player.modifyCash(50);
+			Player.modifyCash(enemyWorth);
 			die();
 		}
 	}
@@ -289,5 +291,9 @@ public class Enemy implements Entity{
 		this.isFrozen = frozen;
 		this.freezeSpeed = freezeSpeed;
 		this.freezeTime = freezeTime;
+	}
+
+	public int getCurrentCheckpoint() {
+		return currentCheckpoint;
 	}
 }

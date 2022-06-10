@@ -2,6 +2,7 @@ package data;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.newdawn.slick.opengl.Texture;
 
 import helpers.Clock;
 
@@ -20,9 +21,12 @@ public class Player {
 	private boolean holdingTower;
 	private Tower tempTower;
 	public static int cash, lives;
+	private TowerMenu openMenu;
 	
 	private float previousMouseX;
 	private float previousMouseY;
+	
+	//Set this for the mean time (want it to be a part of a tower)
 	
 	public Player(TileGrid grid, WaveManager waveManager) {
 		this.grid = grid;
@@ -36,7 +40,6 @@ public class Player {
 		this.leftMouseButtonDown = false;
 		this.holdingTower = false;
 		this.tempTower = null;
-		
 	}
 	
 	public void setup() {
@@ -59,6 +62,10 @@ public class Player {
 	
 	public void update() {
 		
+		//Place this here for now
+		
+		
+		
 		if(holdingTower) {
 			tempTower.setX(getMouseTile().getX());
 			tempTower.setY(getMouseTile().getY());
@@ -76,65 +83,65 @@ public class Player {
 				tm.update();
 		}
 		
+		
 		//Handle mouse input
 		if(!Mouse.isButtonDown(0) && leftMouseButtonDown) {
 			placeTower();
 		}
 		
+		//drawHollowCircle(200, 200, 500);
+		
 		//If clicked on tower
 		if(towerList != null) {
 			
-			
-			
 			for(int i = 0; i < towerList.size(); i++) {
 				
+				//When there is no upgrade yet clicked, set the current statistics for the first upgrade
 				if(towerMenus.get(i).getTowerUpgradeIndex() == 0) {
-					System.out.println("Ran");
-					towerMenus.get(i).setUpgradeTowerTitle(towerList.get(i).getType().name().substring(0, towerList.get(i).getType().name().length()-1)+(towerMenus.get(i).getTowerUpgradeIndex()+2));
-
+					updateTowerData(i, 1);
 				}
 				
 				//Targeting Tower Button
 				if(towerMenus.get(i).getTargetingType() == 0) {
 					towerList.get(i).setTargetingType(1);
-				}else {
+				}else if(towerMenus.get(i).getTargetingType() == 1){
+					towerList.get(i).setTargetingType(2);
+				}else if(towerMenus.get(i).getTargetingType() == 2){
 					towerList.get(i).setTargetingType(0);
 				}
-				
 				//Set current tower in menu
-				towerMenus.get(i).setCurrentTowerMenuTexture(towerList.get(i).getType().textures[0]);
-				towerMenus.get(i).setCurrentTowerTitle(towerList.get(i).getType().name());
+				updateTowerData(i, 0);
 				
 				//Upgrade Tower Button
-				if(Mouse.isButtonDown(0) && !leftMouseButtonDown && towerMenus.get(i).isUpgrade()) {
-					
+				if(Mouse.isButtonDown(0) && !leftMouseButtonDown && towerMenus.get(i).isUpgrade() && modifyCash(-towerList.get(i).getType().next().cost)) {
 					
 					//System.out.println("Tower Cannon " + towerMenus.get(i).getTowerUpgradeIndex());
-					//if(modifyCash(-TowerType.valueOf("TOWER_CANNON"+towerMenus.get(i).getTowerUpgradeIndex()).cost)) {
+					//if(modifyCash(-towerList.get(i).getType().next().cost)) {
 						//Update menu texture
-						//System.out.println(towerMenus.get(i).getTowerUpgradeIndex());
 						if(towerMenus.get(i).getTowerUpgradeIndex() < towerMenus.get(i).getTowerMenuUI().getButton("upgrade").getTextures().length-1) {	
 							towerMenus.get(i).getTowerMenuUI().getButton("upgrade").setCurrentButtonTexture(towerMenus.get(i).getTowerUpgradeIndex()+1);
 						}
 						//Update tower type (includes texture, damage, etc)
-						System.out.println(towerMenus.get(i).getTowerUpgradeIndex());
-						if(towerMenus.get(i).getTowerMenuUI().getButton("upgrade").getTextures().length < 3) {
-							towerList.get(i).setType(TowerType.valueOf("TOWER_CANNON"+(towerMenus.get(i).getTowerUpgradeIndex()+1)));
-							towerMenus.get(i).setUpgradeTowerTitle(towerList.get(i).getType().name().substring(0, towerList.get(i).getType().name().length()-1)+(towerMenus.get(i).getTowerUpgradeIndex()+2));
-						}else {
-							towerList.get(i).setType(TowerType.valueOf("TOWER_CANNON"+(towerMenus.get(i).getTowerUpgradeIndex())));
-							towerMenus.get(i).setUpgradeTowerTitle(towerList.get(i).getType().name().substring(0, towerList.get(i).getType().name().length()-1)+(towerMenus.get(i).getTowerUpgradeIndex()+1));
+						if(towerMenus.get(i).getTowerMenuUI().getButton("upgrade").getTextures().length > 1) {
+							
+							//Set the tower type to the next upgrade
+							towerList.get(i).setType(towerList.get(i).getType().next());
+							//Check if the tower type is a max upgrade
+							if(towerList.get(i).getType().maxUpgrade) {
+								towerMenus.get(i).upgradeTowerTitle = "MAXED";
+								towerList.get(i).updateData();
+							}else {
+								updateTowerData(i, 1);
+								towerList.get(i).updateData();
+							}
 						}
 
 						//Set the upgrade to false to stop loop
 						towerMenus.get(i).setTowerUpgradeIndex(towerMenus.get(i).getTowerUpgradeIndex()+1);
 						towerMenus.get(i).setUpgrade(false);
-						
-						
-					//x}
+					//}
+				
 				}
-				
-				
 				//Checking if tower is clicked; if clicked then setting it to true
 				if(Mouse.isButtonDown(0) && !leftMouseButtonDown && towerList.get(i).getTile() == getMouseTile()) {
 					towerList.get(i).setClicked(true);
@@ -142,11 +149,23 @@ public class Player {
 				
 				//Checking if tower is clicked & the the exit button has not been clicked in tower menu
 				if(towerList.get(i).isClicked() && !towerMenus.get(i).isExitClicked()) {
+		
+					//Update button texture to the correct tower type (ex: Ice Tower)
+					
+					//Draw button slightly larger to make it look like the tower is selected
+					towerList.get(i).setW(TILE_SIZE + 1);
+					towerList.get(i).setH(TILE_SIZE + 1); 
+					
+					//Draw the range radius
+					towerList.get(i).setDrawRangeRadius(true);
 					
 					//Opening tower menu and updating tower upgrade menu
-					//towerMenus.get(i).open();
+					if(openMenu != towerMenus.get(i)) {
+						openMenu.close();
+					}
+					
 					towerMenus.get(i).setOpen(true);
-					//towerMenus.get(i).getTowerMenuUI().getMenu("TowerUpgradeMenu").update();
+					openMenu = towerMenus.get(i);
 					
 					//Checking if mouse button is clicked once
 					if(Mouse.isButtonDown(0) && !leftMouseButtonDown) {
@@ -158,7 +177,7 @@ public class Player {
 						//Checking if mouse is on the menu
 						if(isMouseInBounds(i)) {
 							//Set the holding menu to true
-							towerMenus.get(i).setHoldingMenu(true);
+							openMenu.setHoldingMenu(true);
 						}	
 					}
 					
@@ -170,21 +189,36 @@ public class Player {
 						float yDist = HEIGHT - Mouse.getY() - 1 - previousMouseY;
 						
 						//Set the tower menu to the mouse position respectively
-						towerMenus.get(i).setX(towerMenus.get(i).getX()+xDist);
-						towerMenus.get(i).setY(towerMenus.get(i).getY()+yDist);
+						openMenu.setX(towerMenus.get(i).getX()+xDist);
+						openMenu.setY(towerMenus.get(i).getY()+yDist);
 						
 						//Reset the previous mouse position each update
 						previousMouseX = Mouse.getX();
 						previousMouseY = HEIGHT - Mouse.getY() -1 ;
-					
 					}else{
 						//Set holding menu to false
-						towerMenus.get(i).setHoldingMenu(false);
+						openMenu.setHoldingMenu(false);
+					}
+					
+					//Check if tower is deleted
+					if(openMenu.isDeleteTower()) {
+						towerList.get(i).getTile().setOccupied(false);
+						cash += towerList.get(i).getCost() * 0.5f;
+						
+						System.out.println("Deleted >> " + "ID: " + towerList.get(i).getId() + " >> " + towerList.get(i).getType().towerName);
+						
+						towerMenus.remove(i);
+						towerList.remove(i);
+						
 					}
 				}else{
 					//Reset the variables to allow tower to be re-clicked to open menu 
 					towerMenus.get(i).setExitClicked(false);
 					towerList.get(i).setClicked(false);
+					towerList.get(i).setDrawRangeRadius(false);
+					
+					towerList.get(i).setW(TILE_SIZE);
+					towerList.get(i).setH(TILE_SIZE); 
 				}
 			}
 		}
@@ -206,14 +240,39 @@ public class Player {
 		return Mouse.getX() > towerMenus.get(i).getX() && Mouse.getX() < towerMenus.get(i).getX()+towerMenus.get(i).getW() && HEIGHT - Mouse.getY() - 1 > towerMenus.get(i).getY() && HEIGHT - Mouse.getY() - 1 < towerMenus.get(i).getY()+towerMenus.get(i).getH();
 	}
 	
+	private void updateTowerData(int index, int currentUpgrade) {
+		switch(currentUpgrade) {
+		case 0:
+			//Current
+			towerMenus.get(index).setCurrentTowerMenuTexture(towerList.get(index).getType().textures[2]);
+			towerMenus.get(index).currentTowerTitle = (towerList.get(index).getType().towerName);
+			towerMenus.get(index).currentTowerRange = ("RNG: " + towerList.get(index).getType().range);
+			towerMenus.get(index).currentTowerDamage = ("DMG: " + towerList.get(index).getType().damage);
+			towerMenus.get(index).currentTowerFiringSpeed = ("SPD: " + towerList.get(index).getType().firingSpeed);
+			break;
+		case 1:
+			//Upgrade
+			//towerMenus.get(index).upgradeTowerTitle = towerList.get(index).getType().next().towerName;
+			towerMenus.get(index).upgradeTowerCost = "COST: " + towerList.get(index).getType().next().cost;
+			//towerMenus.get(index).upgradeTowerRange = "Range: " + towerList.get(index).getType().next().range;
+			//towerMenus.get(index).upgradeTowerDamage = "Damage: " + towerList.get(index).getType().next().damage;
+			//towerMenus.get(index).upgradeTowerFiringSpeed = "Firing Speed: " + towerList.get(index).getType().next().firingSpeed;
+			break;
+		}
+	} 
+	
 	private void placeTower() {
 		Tile currentTile = getMouseTile();
 		if(holdingTower)
 			if(!currentTile.isOccupied() && modifyCash(-tempTower.getCost())){
+				tempTower.setId(towerList.size());
 				towerList.add(tempTower);
-				towerMenus.add(new TowerMenu());
+				towerMenus.add(new TowerMenu(tempTower.getType()));
+				openMenu = towerMenus.get(0);
 				tempTower.setTile(currentTile);
 				currentTile.setOccupied(true);
+				
+				System.out.println("Placed >> " + "ID: " + tempTower.getId() + " >> "+ tempTower.getType().towerName);
 			}
 		holdingTower = false;
 		tempTower = null;

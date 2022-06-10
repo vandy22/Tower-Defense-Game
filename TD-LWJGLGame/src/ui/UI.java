@@ -24,6 +24,12 @@ public class UI {
 	public void addButton(String name, String textureName, int x, int y) {
 		buttonList.add(new Button(name, loadTexture(textureName), x, y));
 	}
+	
+	public void addButton(String name, String textureName, int x, int y, int w, int h) {
+		buttonList.add(new Button(name, loadTexture(textureName), x, y, w, h));
+	}
+		
+		
 	//Two textures
 	public void addButton(String name, String[] textureNames, int x, int y) {
 		Texture[] textures = new Texture[textureNames.length];
@@ -31,6 +37,14 @@ public class UI {
 			textures[i] = loadTexture(textureNames[i]);
 		}
 		buttonList.add(new Button(name, textures, x, y));
+	}
+	
+	public void addButton(String name, String[] textureNames, int x, int y, int w, int h) {
+		Texture[] textures = new Texture[textureNames.length];
+		for(int i = 0; i < textures.length; i++) {
+			textures[i] = loadTexture(textureNames[i]);
+		}
+		buttonList.add(new Button(name, textures, x, y, w, h));
 	}
 
 	public boolean isButtonClicked(String buttonName) {
@@ -82,7 +96,9 @@ public class UI {
 		
 		String name;
 		private ArrayList<Button> menuButtons;
-		private int x, y, w, h, numOfButtons, numOfCols, optionsWidth, optionsHeight, padding;
+		//Still needs improvement. Improvised by making this work with tower button.
+		private ArrayList<MenuTexture> menuTextures;
+		private int x, y, w, h, numOfButtons, numOfTextures, optionsWidth, optionsHeight, padding;
 		
 		private TrueTypeFont font;
 		private Font awtFont;
@@ -103,14 +119,13 @@ public class UI {
 				this.padding = (w - optionsWidth * TILE_SIZE) / (optionsWidth + 1);
 			
 			this.numOfButtons = 0;
-			this.numOfCols = 0;
+			this.numOfTextures = 0;
 			this.menuButtons = new ArrayList<Button>();
+			this.menuTextures = new ArrayList<MenuTexture>();
 			
 			awtFont = new Font("Times New Roman", Font.BOLD, fontSize);
 			font = new TrueTypeFont(awtFont, false);
 		}
-		
-		
 		
 		public void drawString(String text, int x, int y) {
 			font.drawString(x, y, text);
@@ -124,27 +139,37 @@ public class UI {
 			if(optionsWidth != 0)
 				b.setY(y + (numOfButtons / optionsWidth) * (padding + TILE_SIZE) + padding);
 			b.setX(x + (numOfButtons % optionsWidth) * (padding + TILE_SIZE) + padding);
-			System.out.println(b.getName());
 			numOfButtons++;
 			menuButtons.add(b);
+		}
+		
+		public void setTexture(MenuTexture t) {
+			if(optionsWidth != 0)
+				t.setY(y + (numOfTextures / optionsWidth) * (padding + TILE_SIZE) + padding);
+			t.setX(x + (numOfTextures % optionsWidth) * (padding + TILE_SIZE) + padding);
+			numOfTextures++;
+			menuTextures.add(t);
 		}
 		
 		public void updateFont(int fontSize) {
 			this.fontSize = fontSize;
 			awtFont = new Font("Times New Roman", Font.BOLD, fontSize);
 			font = new TrueTypeFont(awtFont, false);
-			System.out.println("running");
 		}
 		
 		public void update() {
 			numOfButtons = 0;
+			for(MenuTexture t: menuTextures) {
+				t.setY(y + (numOfButtons / optionsWidth) * (padding + TILE_SIZE) + padding);
+				t.setX(x + (numOfButtons % optionsWidth) * (padding + TILE_SIZE) + padding);
+			}
+				
+			
 			for(Button b: menuButtons) {
 				b.setY(y + (numOfButtons / optionsWidth) * (padding + TILE_SIZE) + padding);
 				b.setX(x + (numOfButtons % optionsWidth) * (padding + TILE_SIZE) + padding);
 				numOfButtons++;
 			}
-			
-			
 		}
 		
 		public boolean isButtonClicked(String buttonName) {
@@ -165,12 +190,31 @@ public class UI {
 			return null;
 		}
 		
-		public void quickAdd(String buttonName, String buttonTextureName) {
+		public void quickAddButton(String buttonName, String buttonTextureName) {
 			Button b = new Button(buttonName, loadTexture(buttonTextureName), 0, 0);
 			setButton(b);
 		}
+		public void quickAddTowerButton(String buttonName, String buttonTextureName) {
+			//Can add another paramter to change tower coaster if need be in future
+			Button b = new Button(buttonName, loadTexture(buttonTextureName), 0, 0);
+			MenuTexture mt = new MenuTexture(buttonName, loadTexture("tower_coaster"), 0, 0);
+			setButton(b);
+			setTexture(mt);
+		}
+		
+		public void quickAddTexture(String textureName, String texturePathName) {
+			//TODO
+			//setTexture();
+		}
+		
+		
 		
 		public void draw() {
+		
+			for(MenuTexture t: menuTextures) {
+				drawQuadTex(t.getT(), t.getX(), t.getY(), t.getT().getImageWidth(), t.getT().getImageHeight());
+			}
+			
 			for(Button b: menuButtons) {
 				drawQuadTex(b.getTexture(), b.getX(), b.getY(), b.getW(), b.getH());
 			}
@@ -216,5 +260,68 @@ public class UI {
 			this.fontSize = fontSize;
 		}
 		
+	}
+	
+	public class MenuTexture {
+		
+		private float x, y;
+		private int w, h;
+		private Texture t;
+		private String name;
+		
+		public MenuTexture(String name, Texture t, float x, float y) {
+			this.name = name;
+			this.t = t;
+			this.x = x;
+			this.y = y;
+		}
+
+		public float getX() {
+			return x;
+		}
+
+		public void setX(float x) {
+			this.x = x;
+		}
+
+		public float getY() {
+			return y;
+		}
+
+		public void setY(float y) {
+			this.y = y;
+		}
+
+		public int getW() {
+			return w;
+		}
+
+		public void setW(int w) {
+			this.w = w;
+		}
+
+		public int getH() {
+			return h;
+		}
+
+		public void setH(int h) {
+			this.h = h;
+		}
+
+		public Texture getT() {
+			return t;
+		}
+
+		public void setT(Texture t) {
+			this.t = t;
+		}
+		
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
 	}
 }

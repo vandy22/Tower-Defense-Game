@@ -39,9 +39,9 @@ public class Editor {
 		editorUI = new UI();
 		editorUI.createMenu("TilePicker", 1280, 70, 192, 960, 2, 0, 0, false, 0);
 		tilePickerMenu = editorUI.getMenu("TilePicker");
-		tilePickerMenu.quickAdd("grass", "grass");
-		tilePickerMenu.quickAdd("dirt", "dirt");
-		tilePickerMenu.quickAdd("water", "water");
+		tilePickerMenu.quickAddButton("grass", "grass");
+		tilePickerMenu.quickAddButton("dirt", "dirt");
+		tilePickerMenu.quickAddButton("water", "water");
 	}
 
 	public void update() {
